@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Inventori;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 
 class InventoriController extends Controller
 {
@@ -13,6 +16,8 @@ class InventoriController extends Controller
     public function index()
     {
         //
+        $user = DB::table('users')->where('id', auth::user()->id)->first();
+        return view('partials.feature.inventori', compact('user'));
     }
 
     /**

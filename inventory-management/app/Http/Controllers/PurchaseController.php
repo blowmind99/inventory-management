@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Purchase;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 class PurchaseController extends Controller
 {
     /**
@@ -13,6 +14,8 @@ class PurchaseController extends Controller
     public function index()
     {
         //
+        $user = DB::table('users')->where('id', auth::user()->id)->first();
+        return view('partials.feature.purchase', compact('user'));
     }
 
     /**

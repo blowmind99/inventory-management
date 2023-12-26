@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Sales;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class SalesController extends Controller
 {
@@ -13,6 +15,8 @@ class SalesController extends Controller
     public function index()
     {
         //
+        $user = DB::table('users')->where('id', auth::user()->id)->first();
+        return view('partials.feature.sales', compact('user'));
     }
 
     /**

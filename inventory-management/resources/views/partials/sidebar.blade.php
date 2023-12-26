@@ -9,7 +9,7 @@
           <span class="smini-visible fw-bold tracking-wide fs-lg">
             c<span class="text-primary">b</span>
           </span>
-          <a class="link-fx fw-bold tracking-wide mx-auto" href="{{ url('/dashboard') }}">
+          <a class="link-fx fw-bold tracking-wide mx-auto" href="/">
             <span class="smini-hidden">
               <i class="fa fa-fire text-primary"></i>
               <span class="fs-4 text-dual">fana</span><span class="fs-4 text-primary">tech</span>
@@ -42,21 +42,21 @@
             
             @if($user->role == 'superadmin')
               <li class="nav-main-item">
-                <a class="nav-main-link" href="">
+                <a class="nav-main-link" href="{{ url('/dashboard/inventori') }}">
                   <i class="nav-main-link-icon fa-solid fa-boxes-stacked"></i>
                   <span class="nav-main-link-name">Inventori</span>
                 </a>
               </li>
 
               <li class="nav-main-item">
-                <a class="nav-main-link" href="">
+                <a class="nav-main-link" href="{{ url('/dashboard/sales') }}">
                   <i class="nav-main-link-icon fa-solid fa-shop"></i>
                   <span class="nav-main-link-name">Sales</span>
                 </a>
               </li>
 
               <li class="nav-main-item">
-                <a class="nav-main-link" href="">
+                <a class="nav-main-link" href="{{ url('/dashboard/purchase') }}">
                   <i class="nav-main-link-icon fa-solid fa-basket-shopping"></i>
                   <span class="nav-main-link-name">Purchase</span>
                 </a>
