@@ -20,9 +20,19 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/',[LoginController::class, 'index']);
 Route::post('/dashboard',[LoginController::class, 'login']);
-Route::group(['middleware' => ['auth']], function () { 
+Route::get('/test',[InventoriController::class, 'test']);
+Route::get('/dashboard', [LoginController::class, 'dashboard']); 
+Route::group(['middleware' => ['auth']], function () {
     Route::get('/logout',[Logout::class, 'logout']);
-    Route::get('/dashboard/inventori',[InventoriController::class, 'index']);
     Route::get('/dashboard/sales',[SalesController::class, 'index']);
     Route::get('/dashboard/purchase',[PurchaseController::class, 'index']);
+});
+
+Route::group(['middleware' => ['auth']], function () {
+    Route::get('/dashboard/inventori',[InventoriController::class, 'index']);
+    Route::get('/dashboard/inventori/edit/{id}',[InventoriController::class, 'edit']);
+    Route::post('/dashboard/inventori/edit/{id}',[InventoriController::class, 'update']);
+    Route::post('/dashboard/inventori/delete/{id}',[InventoriController::class, 'destroy']);
+    Route::get('/dashboard/inventori/create', [InventoriController::class, 'create']);
+    Route::post('/dashboard/inventori/add', [InventoriController::class, 'store']);
 });

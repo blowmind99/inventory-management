@@ -76,27 +76,130 @@
                         </tr>
                       </thead>
                       <tbody>
-                        @for($i=0; $i<3; $i++)
+                        @forelse($inventori as $inv)
+                          <?php
+                            $price = $inv->price;
+                            $formattedPrice = 'Rp. ' . number_format(floatval($price), 0, ',', '.');
+                          ?>
                           <tr>
-                            <td>
-                              <a class="fw-semibold" href="javascript:void(0)">54874</a>
-                            </td>
-                            <td>
-                              <a class="fw-semibold" href="javascript:void(0)">awdawd</a>
-                            </td>
-                            <td>
-                              <a class="fw-semibold" href="javascript:void(0)">2000</a>
-                            </td>
-                            <td>
-                              <a class="fw-semibold" href="javascript:void(0)">200</a>
-                            </td>
-                            <td>
-                              <a class="btn btn-sm btn-alt-secondary" href="javascript:void(0)">
-                                <i class="fa fa-heartbeat text-danger me-1"></i> Medical History
-                              </a>
-                            </td>
+                              <td>
+                                  <a class="fw-semibold" href="javascript:void(0)">{{ $inv->code }}</a>
+                              </td>
+                              <td>
+                                  <a class="fw-semibold" href="javascript:void(0)">{{ $inv->name }}</a>
+                              </td>
+                              <td>
+                                  <a class="fw-semibold" href="javascript:void(0)">{{ $formattedPrice }}</a>
+                              </td>
+                              <td>
+                                  <a class="fw-semibold" href="javascript:void(0)">{{ $inv->stock }}</a>
+                              </td>
+                              <td>
+                                  <a class="btn btn-sm btn-alt-secondary" href="{{ url('/dashboard/inventori/edit/'.encrypt($inv->id)) }}">
+                                      <i class="fa fa-pencil text-success me-1"></i> Edit
+                                  </a>
+                                  <a type="button" class="btn btn-sm btn-alt-secondary" data-bs-toggle="modal" data-bs-target="#modal-fadeinshow{{ $inv->id }}">
+                                      <i class="fa fa-eye text-primary me-1"></i> Show
+                                  </a>
+                                  <a type="button" class="btn btn-sm btn-alt-secondary" data-bs-toggle="modal" data-bs-target="#modal-fadein{{ $inv->id }}">
+                                      <i class="fa fa-trash text-danger me-1"></i> Delete
+                                  </a>
+                              
+                              </td>
                           </tr>
-                        @endfor
+                          <!--- Modal Delete -->
+                            <div class="modal fade" id="modal-fadein{{ $inv->id }}" tabindex="-1" aria-labelledby="modal-fadein" style="display: none;" aria-modal="true" role="dialog">
+                              <div class="modal-dialog" role="document" >
+                                  <div class="modal-content">
+                                      <form action="{{ url('/dashboard/inventori/delete/'.$inv->id) }}" enctype="multipart/form-data" method="post">
+                                          @csrf
+                                          <div class="block block-rounded shadow-none mb-0">
+                                              <div class="block-header block-header-default">
+                                                  <h3 class="block-title">Delete  Data {{ $inv->id }}</h3>
+                                                  <div class="block-options">
+                                                  <button type="button" class="btn-block-option" data-bs-dismiss="modal" aria-label="Close">
+                                                      <i class="fa fa-times"></i>
+                                                  </button>
+                                                  </div>
+                                              </div>
+                                              <div class="block-content fs-sm">
+                                                  <div class="text-center">
+                                                      <img src="{{ asset('frontend/assets/media/sure.gif') }}" alt="" class="text-center mb-4">
+                                                      <p class="text-info-emphasis fw-semibold">Are You Sure?</p>
+
+                                                  </div>
+                                              </div>
+                                              <div class="block-content block-content-full block-content-sm text-end border-top">
+                                                  <button type="button" class="btn btn-alt-secondary" data-bs-dismiss="modal">
+                                                  Close
+                                                  </button>
+                                                  <button type="submit" class="btn btn-alt-primary" data-bs-dismiss="modal">
+                                                  Done
+                                                  </button>
+                                              </div>
+                                          </div>
+                                      </form>
+                                  </div>
+                              </div>
+                            </div>
+                          <!--- End Modal -->
+
+                          <!--- Modal show -->
+                            <div class="modal fade" id="modal-fadeinshow{{ $inv->id }}" tabindex="-1" aria-labelledby="modal-fadein" style="display: none;" aria-modal="true" role="dialog">
+                              <div class="modal-dialog" role="document" >
+                                  <div class="modal-content">
+                                    <div class="block block-rounded shadow-none mb-0">
+                                        <div class="block-header block-header-default">
+                                            <h3 class="block-title">Show Data {{ $inv->id }}</h3>
+                                            <div class="block-options">
+                                            <button type="button" class="btn-block-option" data-bs-dismiss="modal" aria-label="Close">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                            </div>
+                                        </div>
+                                        @php
+                                          $data = App\Models\Inventori::find($inv->id);
+                                        @endphp
+                                        <div class="block-content fs-sm">
+                                          <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="mb-4">
+                                                    <label class="form-label" for="example-text-input">Code</label>
+                                                    <input type="text" class="form-control" id="example-text-input" name="code" value="{{ $data->code }}"readonly>
+                                                </div>
+                                                <div class="mb-4">
+                                                    <label class="form-label" for="example-text-input">Name</label>
+                                                    <input type="text" class="form-control" id="example-text-input" name="name" value="{{ $data->name }}" readonly>
+                                                </div>
+                                                <div class="mb-4">
+                                                    <label class="form-label" for="example-text-input">Price</label>
+                                                    <input type="number" class="form-control" id="example-text-input" name="price" value="{{ $data->price }}" readonly>
+                                                </div>
+                                                <div class="mb-4">
+                                                    <label class="form-label" for="example-text-input">Stock</label>
+                                                    <input type="number" class="form-control" id="example-text-input" name="stock" value="{{ $data->stock }}"readonly>
+                                                </div>
+                                              </div>
+                                            </div>
+                                        </div>
+                                        <div class="block-content block-content-full block-content-sm text-end border-top">
+                                            <button type="button" class="btn btn-alt-secondary" data-bs-dismiss="modal">
+                                            Close
+                                            </button>
+                                            <button type="button" class="btn btn-alt-primary" data-bs-dismiss="modal">
+                                            Done
+                                            </button>
+                                        </div>
+                                    </div>
+                                  </div>
+                              </div>
+                            </div>
+                          <!--- End Modal -->
+                        @empty
+                          <tr>
+                              <td colspan="5" class="fw-semibold text-muted text-center">Data Not Available</td>
+                          </tr>
+                        @endforelse
                       </tbody>
                     </table>
                   </div>
@@ -122,31 +225,42 @@
                     <table class="table table-borderless table-hover table-striped table-vcenter mb-0">
                       <thead>
                         <tr>
-                          <th style="width: 100px;">Number</th>
+                          <th>Number</th>
                           <th>Date</th>
-                          <th>Sell By</th>
+                          <th>Sales By</th>
                           <th>Actions</th>
                         </tr>
                       </thead>
                       <tbody>
-                        @for($i=0; $i<3; $i++)
+                        @forelse($sales as $sl)
                           <tr>
-                            <td>
-                              <a class="fw-semibold" href="javascript:void(0)">54874</a>
-                            </td>
-                            <td>
-                              <span class="text-muted">3 days ago</span>
-                            </td>
-                            <td>
-                              <strong>Rose</strong>
-                            </td>
-                            <td>
-                              <a class="btn btn-sm btn-alt-secondary" href="javascript:void(0)">
-                                <i class="fa fa-heartbeat text-danger me-1"></i> Medical History
-                              </a>
-                            </td>
+                              <td>
+                                  <a class="fw-semibold" href="javascript:void(0)">{{ $sl->number }}</a>
+                              </td>
+                              <td>
+                                  <a class="fw-semibold" href="javascript:void(0)">{{ $sl->date }}</a>
+                              </td>
+                              <td>
+                                  <a class="fw-semibold" href="javascript:void(0)">{{ $sl->users_id }}</a>
+                              </td>
+                              <td>
+                                  <a class="btn btn-sm btn-alt-secondary" href="{{ url('/dashboard/inventori/edit/'.encrypt($sl->id)) }}">
+                                      <i class="fa fa-pencil text-success me-1"></i> Edit
+                                  </a>
+                                  <a class="btn btn-sm btn-alt-secondary" href="javascript:void(0)">
+                                      <i class="fa fa-eye text-primary me-1"></i> Show
+                                  </a>
+                                  <a type="button" class="btn btn-sm btn-alt-secondary" data-bs-toggle="modal" data-bs-target="#modal-fadein{{ $sl->id }}">
+                                      <i class="fa fa-trash text-danger me-1"></i> Delete
+                                  </a>
+                              
+                              </td>
                           </tr>
-                        @endfor
+                        @empty
+                          <tr>
+                              <td colspan="5" class="fw-semibold text-muted text-center">Data Not Available</td>
+                          </tr>
+                        @endforelse
                       </tbody>
                     </table>
                   </div>
@@ -172,31 +286,42 @@
                     <table class="table table-borderless table-hover table-striped table-vcenter mb-0">
                       <thead>
                         <tr>
-                          <th style="width: 100px;">Number</th>
+                          <th>Number</th>
                           <th>Date</th>
                           <th>Purchase By</th>
                           <th>Actions</th>
                         </tr>
                       </thead>
                       <tbody>
-                        @for($i=0; $i<3; $i++)
+                        @forelse($purchase as $prchs)
                           <tr>
-                            <td>
-                              <a class="fw-semibold" href="javascript:void(0)">54874</a>
-                            </td>
-                            <td>
-                              <span class="text-muted">3 days ago</span>
-                            </td>
-                            <td>
-                              <strong>Rose</strong>
-                            </td>
-                            <td>
-                              <a class="btn btn-sm btn-alt-secondary" href="javascript:void(0)">
-                                <i class="fa fa-heartbeat text-danger me-1"></i> Medical History
-                              </a>
-                            </td>
+                              <td>
+                                  <a class="fw-semibold" href="javascript:void(0)">{{ $prchs->number }}</a>
+                              </td>
+                              <td>
+                                  <a class="fw-semibold" href="javascript:void(0)">{{ $prchs->date }}</a>
+                              </td>
+                              <td>
+                                  <a class="fw-semibold" href="javascript:void(0)">{{ $prchs->users_id }}</a>
+                              </td>
+                              <td>
+                                  <a class="btn btn-sm btn-alt-secondary" href="{{ url('/dashboard/inventori/edit/'.encrypt($prchs->id)) }}">
+                                      <i class="fa fa-pencil text-success me-1"></i> Edit
+                                  </a>
+                                  <a class="btn btn-sm btn-alt-secondary" href="javascript:void(0)">
+                                      <i class="fa fa-eye text-primary me-1"></i> Show
+                                  </a>
+                                  <a type="button" class="btn btn-sm btn-alt-secondary" data-bs-toggle="modal" data-bs-target="#modal-fadein{{ $prchs->id }}">
+                                      <i class="fa fa-trash text-danger me-1"></i> Delete
+                                  </a>
+                              
+                              </td>
                           </tr>
-                        @endfor
+                        @empty
+                          <tr>
+                              <td colspan="5" class="fw-semibold text-muted text-center">Data Not Available</td>
+                          </tr>
+                        @endforelse
                       </tbody>
                     </table>
                   </div>
@@ -204,6 +329,7 @@
 
               </div>
               <!-- END Purchase -->
+              
             @elseif($user->role == 'manager')
 
               <!-- Sales -->
@@ -218,34 +344,6 @@
                   </div>
                 </div>
 
-                <div class="block-content block-content-full">
-                  <div class="table-responsive">
-                    <table class="table table-borderless table-hover table-striped table-vcenter mb-0">
-                      <thead>
-                        <tr>
-                          <th style="width: 100px;">Number</th>
-                          <th>Date</th>
-                          <th>Sell By</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @for($i=0; $i<3; $i++)
-                          <tr>
-                            <td>
-                              <a class="fw-semibold" href="javascript:void(0)">54874</a>
-                            </td>
-                            <td>
-                              <span class="text-muted">3 days ago</span>
-                            </td>
-                            <td>
-                              <strong>Rose</strong>
-                            </td>
-                          </tr>
-                        @endfor
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
 
               </div>
               <!-- END Sales -->
@@ -262,34 +360,7 @@
                   </div>
                 </div>
 
-                <div class="block-content block-content-full">
-                  <div class="table-responsive">
-                    <table class="table table-borderless table-hover table-striped table-vcenter mb-0">
-                      <thead>
-                        <tr>
-                          <th style="width: 100px;">Number</th>
-                          <th>Date</th>
-                          <th>Purchase By</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @for($i=0; $i<3; $i++)
-                          <tr>
-                            <td>
-                              <a class="fw-semibold" href="javascript:void(0)">54874</a>
-                            </td>
-                            <td>
-                              <span class="text-muted">3 days ago</span>
-                            </td>
-                            <td>
-                              <strong>Rose</strong>
-                            </td>
-                          </tr>
-                        @endfor
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                
 
               </div>
               <!-- END Purchase -->
@@ -306,40 +377,7 @@
                     </div>
                   </div>
   
-                  <div class="block-content block-content-full">
-                    <div class="table-responsive">
-                      <table class="table table-borderless table-hover table-striped table-vcenter mb-0">
-                        <thead>
-                          <tr>
-                            <th style="width: 100px;">Number</th>
-                            <th>Date</th>
-                            <th>Sell By</th>
-                            <th>Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          @for($i=0; $i<3; $i++)
-                            <tr>
-                              <td>
-                                <a class="fw-semibold" href="javascript:void(0)">54874</a>
-                              </td>
-                              <td>
-                                <span class="text-muted">3 days ago</span>
-                              </td>
-                              <td>
-                                <strong>Rose</strong>
-                              </td>
-                              <td>
-                                <a class="btn btn-sm btn-alt-secondary" href="javascript:void(0)">
-                                  <i class="fa fa-heartbeat text-danger me-1"></i> Medical History
-                                </a>
-                              </td>
-                            </tr>
-                          @endfor
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
+                  
   
                 </div>
 
@@ -358,40 +396,7 @@
                     </div>
                   </div>
   
-                  <div class="block-content block-content-full">
-                    <div class="table-responsive">
-                      <table class="table table-borderless table-hover table-striped table-vcenter mb-0">
-                        <thead>
-                          <tr>
-                            <th style="width: 100px;">Number</th>
-                            <th>Date</th>
-                            <th>Purchase By</th>
-                            <th>Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          @for($i=0; $i<3; $i++)
-                            <tr>
-                              <td>
-                                <a class="fw-semibold" href="javascript:void(0)">54874</a>
-                              </td>
-                              <td>
-                                <span class="text-muted">3 days ago</span>
-                              </td>
-                              <td>
-                                <strong>Rose</strong>
-                              </td>
-                              <td>
-                                <a class="btn btn-sm btn-alt-secondary" href="javascript:void(0)">
-                                  <i class="fa fa-heartbeat text-danger me-1"></i> Medical History
-                                </a>
-                              </td>
-                            </tr>
-                          @endfor
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
+                  
   
                 </div>
               <!-- END Purchase -->
