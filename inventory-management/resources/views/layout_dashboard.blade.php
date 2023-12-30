@@ -49,6 +49,23 @@
                   </div>
               </div>
             </div>
+            @if(session('message'))
+              <div class="alert alert-success alert-dismissible" role="alert">
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  <h3 class="alert-heading fs-5 fw-bold mb-1">Success</h3>
+                  <p class="mb-0">
+                      {{ session('message') }}
+                  </p>
+              </div>
+            @elseif(session('error'))
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <h3 class="alert-heading fs-5 fw-bold mb-1">Error</h3>
+                    <p class="mb-0">
+                        {{ session('error') }}
+                    </p> 
+                </div>
+            @endif
             <!-- END Header -->
             @if($user->role == 'superadmin')
               <!-- Inventori -->
@@ -72,6 +89,7 @@
                           <th>Name</th>
                           <th>Price</th>
                           <th>Stock</th>
+                          <th>Latest Stock</th>
                           <th>Actions</th>
                         </tr>
                       </thead>
@@ -94,6 +112,15 @@
                               <td>
                                   <a class="fw-semibold" href="javascript:void(0)">{{ $inv->stock }}</a>
                               </td>
+                              @if($inv->latest_stock == null )
+                                <td>
+                                  <a class="fw-semibold" href="javascript:void(0)">{{ $inv->stock }}</a>
+                                </td>
+                              @else
+                                <td>
+                                    <a class="fw-semibold" href="javascript:void(0)">{{ $inv->latest_stock }}</a>
+                                </td>
+                              @endif
                               <td>
                                   <a class="btn btn-sm btn-alt-secondary" href="{{ url('/dashboard/inventori/edit/'.encrypt($inv->id)) }}">
                                       <i class="fa fa-pencil text-success me-1"></i> Edit
@@ -179,6 +206,17 @@
                                                     <label class="form-label" for="example-text-input">Stock</label>
                                                     <input type="number" class="form-control" id="example-text-input" name="stock" value="{{ $data->stock }}"readonly>
                                                 </div>
+                                                @if($data->latest_stock == null)
+                                                  <div class="mb-4">
+                                                    <label class="form-label" for="example-text-input">Latest Stock</label>
+                                                    <input type="number" class="form-control" id="example-text-input" name="stock" value="{{ $data->stock }}"readonly>
+                                                  </div>
+                                                @else
+                                                  <div class="mb-4">
+                                                    <label class="form-label" for="example-text-input">Latest Stock</label>
+                                                    <input type="number" class="form-control" id="example-text-input" name="stock" value="{{ $data->latest_stock }}"readonly>
+                                                  </div>
+                                                @endif
                                               </div>
                                             </div>
                                         </div>
@@ -232,30 +270,126 @@
                         </tr>
                       </thead>
                       <tbody>
-                        @forelse($sales as $sl)
+                        @forelse($sales as $sls)
                           <tr>
                               <td>
-                                  <a class="fw-semibold" href="javascript:void(0)">{{ $sl->number }}</a>
+                                  <a class="fw-semibold" href="javascript:void(0)">{{ $sls->number }}</a>
                               </td>
                               <td>
-                                  <a class="fw-semibold" href="javascript:void(0)">{{ $sl->date }}</a>
+                                  <a class="fw-semibold" href="javascript:void(0)">{{ $sls->date }}</a>
                               </td>
                               <td>
-                                  <a class="fw-semibold" href="javascript:void(0)">{{ $sl->users_id }}</a>
+                                  <a class="fw-semibold" href="javascript:void(0)">{{ $sls->users_id }}</a>
                               </td>
                               <td>
-                                  <a class="btn btn-sm btn-alt-secondary" href="{{ url('/dashboard/inventori/edit/'.encrypt($sl->id)) }}">
+                                  <a class="btn btn-sm btn-alt-secondary" href="{{ url('/dashboard/sales/edit/'.encrypt($sls->id)) }}">
                                       <i class="fa fa-pencil text-success me-1"></i> Edit
                                   </a>
-                                  <a class="btn btn-sm btn-alt-secondary" href="javascript:void(0)">
+                                  <a type="button" class="btn btn-sm btn-alt-secondary" data-bs-toggle="modal" data-bs-target="#modal-fadeinshowsl{{ $sls->id }}">
                                       <i class="fa fa-eye text-primary me-1"></i> Show
                                   </a>
-                                  <a type="button" class="btn btn-sm btn-alt-secondary" data-bs-toggle="modal" data-bs-target="#modal-fadein{{ $sl->id }}">
+                                  <a type="button" class="btn btn-sm btn-alt-secondary" data-bs-toggle="modal" data-bs-target="#modal-fadeinsl{{ $sls->id }}">
                                       <i class="fa fa-trash text-danger me-1"></i> Delete
                                   </a>
                               
                               </td>
                           </tr>
+                            <!--- Modal Delete -->
+                            <div class="modal fade" id="modal-fadeinsl{{ $sls->id }}" tabindex="-1" aria-labelledby="modal-fadein" style="display: none;" aria-modal="true" role="dialog">
+                              <div class="modal-dialog" role="document" >
+                                  <div class="modal-content">
+                                      <form action="{{ url('/dashboard/sales/delete/'.$sls->id) }}" enctype="multipart/form-data" method="post">
+                                          @csrf
+                                          <div class="block block-rounded shadow-none mb-0">
+                                              <div class="block-header block-header-default">
+                                                  <h3 class="block-title">Delete  Data {{ $sls->id }}</h3>
+                                                  <div class="block-options">
+                                                  <button type="button" class="btn-block-option" data-bs-dismiss="modal" aria-label="Close">
+                                                      <i class="fa fa-times"></i>
+                                                  </button>
+                                                  </div>
+                                              </div>
+                                              <div class="block-content fs-sm">
+                                                  <div class="text-center">
+                                                      <img src="{{ asset('frontend/assets/media/sure.gif') }}" alt="" class="text-center mb-4">
+                                                      <p class="text-info-emphasis fw-semibold">Are You Sure?</p>
+
+                                                  </div>
+                                              </div>
+                                              <div class="block-content block-content-full block-content-sm text-end border-top">
+                                                  <button type="button" class="btn btn-alt-secondary" data-bs-dismiss="modal">
+                                                  Close
+                                                  </button>
+                                                  <button type="submit" class="btn btn-alt-primary" data-bs-dismiss="modal">
+                                                  Done
+                                                  </button>
+                                              </div>
+                                          </div>
+                                      </form>
+                                  </div>
+                              </div>
+                            </div>
+                            <!--- End Modal -->
+
+                          <!--- Modal show -->
+                            <div class="modal fade" id="modal-fadeinshowsl{{ $sls->id }}" tabindex="-1" aria-labelledby="modal-fadein" style="display: none;" aria-modal="true" role="dialog">
+                              <div class="modal-dialog" role="document" >
+                                  <div class="modal-content">
+                                    <div class="block block-rounded shadow-none mb-0">
+                                        <div class="block-header block-header-default">
+                                            <h3 class="block-title">Show Data {{ $sls->id }}</h3>
+                                            <div class="block-options">
+                                            <button type="button" class="btn-block-option" data-bs-dismiss="modal" aria-label="Close">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                            </div>
+                                        </div>
+                                        @php
+                                          $data = App\Models\Sales::find($sls->id)->first();
+                                          $details = App\Models\SalesDetail::where('sales_id', $sls->id)->first();
+                                        @endphp
+                                        <div class="block-content fs-sm">
+                                          <div class="row">
+                                            <div class="col-lg-12">
+                                              <div class="mb-4">
+                                                  <label class="form-label" for="example-text-input">Number</label>
+                                                  <input type="text" class="form-control" id="example-text-input" name="code" value="{{ $data->number }}"readonly>
+                                              </div>
+                                              <div class="mb-4">
+                                                  <label class="form-label" for="example-text-input">Date</label>
+                                                  <input type="text" class="form-control" id="example-text-input" name="name" value="{{ $data->date }}" readonly>
+                                              </div>
+                                              <div class="mb-4">
+                                                  <label class="form-label" for="example-text-input">Item</label>
+                                                      <input type="text" class="form-control" id="example-text-input" name="price" value="{{ $details->inventori->code }}" readonly>
+                                              </div>
+                                              <div class="mb-4">
+                                                  <label class="form-label" for="example-text-input">Quantity</label>
+                                                  <input type="number" class="form-control" id="example-text-input" name="stock" value="{{ $details->qty }}"readonly>
+                                              </div>
+                                              <div class="mb-4">
+                                                  <label class="form-label" for="example-text-input">Price</label>
+                                                  <input type="text" class="form-control" id="example-text-input" name="stock" value="Rp. {{ number_format(floatval($details->price), 0, ',', '.') }}"readonly>
+                                              </div>
+                                              <div class="mb-4">
+                                                  <label class="form-label" for="example-text-input">Sell By</label>
+                                                  <input type="text" class="form-control" id="example-text-input" name="stock" value="{{ $data->user->username }}"readonly>
+                                              </div>
+                                          </div>
+                                        </div>
+                                        <div class="block-content block-content-full block-content-sm text-end border-top">
+                                            <button type="button" class="btn btn-alt-secondary" data-bs-dismiss="modal">
+                                            Close
+                                            </button>
+                                            <button type="button" class="btn btn-alt-primary" data-bs-dismiss="modal">
+                                            Done
+                                            </button>
+                                        </div>
+                                    </div>
+                                  </div>
+                              </div>
+                            </div>
+                          <!--- End Modal -->
                         @empty
                           <tr>
                               <td colspan="5" class="fw-semibold text-muted text-center">Data Not Available</td>
@@ -305,18 +439,114 @@
                                   <a class="fw-semibold" href="javascript:void(0)">{{ $prchs->users_id }}</a>
                               </td>
                               <td>
-                                  <a class="btn btn-sm btn-alt-secondary" href="{{ url('/dashboard/inventori/edit/'.encrypt($prchs->id)) }}">
+                                  <a class="btn btn-sm btn-alt-secondary" href="{{ url('/dashboard/purchase/edit/'.encrypt($prchs->id)) }}">
                                       <i class="fa fa-pencil text-success me-1"></i> Edit
                                   </a>
-                                  <a class="btn btn-sm btn-alt-secondary" href="javascript:void(0)">
+                                  <a type="button" class="btn btn-sm btn-alt-secondary" data-bs-toggle="modal" data-bs-target="#modal-fadeinps{{ $prchs->id }}">
                                       <i class="fa fa-eye text-primary me-1"></i> Show
                                   </a>
-                                  <a type="button" class="btn btn-sm btn-alt-secondary" data-bs-toggle="modal" data-bs-target="#modal-fadein{{ $prchs->id }}">
+                                  <a type="button" class="btn btn-sm btn-alt-secondary" data-bs-toggle="modal" data-bs-target="#modal-fadeinp{{ $prchs->id }}">
                                       <i class="fa fa-trash text-danger me-1"></i> Delete
                                   </a>
                               
                               </td>
                           </tr>
+                          <!--- Modal Delete -->
+                          <div class="modal fade" id="modal-fadeinp{{ $prchs->id }}" tabindex="-1" aria-labelledby="modal-fadein" style="display: none;" aria-modal="true" role="dialog">
+                            <div class="modal-dialog" role="document" >
+                                <div class="modal-content">
+                                    <form action="{{ url('/dashboard/purchase/delete/'.$prchs->id) }}" enctype="multipart/form-data" method="post">
+                                        @csrf
+                                        <div class="block block-rounded shadow-none mb-0">
+                                            <div class="block-header block-header-default">
+                                                <h3 class="block-title">Delete  Data {{ $prchs->id }}</h3>
+                                                <div class="block-options">
+                                                <button type="button" class="btn-block-option" data-bs-dismiss="modal" aria-label="Close">
+                                                    <i class="fa fa-times"></i>
+                                                </button>
+                                                </div>
+                                            </div>
+                                            <div class="block-content fs-sm">
+                                                <div class="text-center">
+                                                    <img src="{{ asset('frontend/assets/media/sure.gif') }}" alt="" class="text-center mb-4">
+                                                    <p class="text-info-emphasis fw-semibold">Are You Sure?</p>
+
+                                                </div>
+                                            </div>
+                                            <div class="block-content block-content-full block-content-sm text-end border-top">
+                                                <button type="button" class="btn btn-alt-secondary" data-bs-dismiss="modal">
+                                                Close
+                                                </button>
+                                                <button type="submit" class="btn btn-alt-primary" data-bs-dismiss="modal">
+                                                Done
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                          </div>
+                          <!--- End Modal -->
+
+                        <!--- Modal show -->
+                          <div class="modal fade" id="modal-fadeinps{{ $prchs->id }}" tabindex="-1" aria-labelledby="modal-fadein" style="display: none;" aria-modal="true" role="dialog">
+                            <div class="modal-dialog" role="document" >
+                                <div class="modal-content">
+                                  <div class="block block-rounded shadow-none mb-0">
+                                      <div class="block-header block-header-default">
+                                          <h3 class="block-title">Show Data {{ $prchs->id }}</h3>
+                                          <div class="block-options">
+                                          <button type="button" class="btn-block-option" data-bs-dismiss="modal" aria-label="Close">
+                                              <i class="fa fa-times"></i>
+                                          </button>
+                                          </div>
+                                      </div>
+                                      @php
+                                        $data = App\Models\Purchase::find($prchs->id)->first();
+                                        $details = App\Models\PurchaseDetail::where('purchase_id', $prchs->id)->first();
+                                      @endphp
+                                      <div class="block-content fs-sm">
+                                        <div class="row">
+                                          <div class="col-lg-12">
+                                            <div class="mb-4">
+                                                <label class="form-label" for="example-text-input">Number</label>
+                                                <input type="text" class="form-control" id="example-text-input" name="code" value="{{ $data->number }}"readonly>
+                                            </div>
+                                            <div class="mb-4">
+                                                <label class="form-label" for="example-text-input">Date</label>
+                                                <input type="text" class="form-control" id="example-text-input" name="name" value="{{ $data->date }}" readonly>
+                                            </div>
+                                            <div class="mb-4">
+                                                <label class="form-label" for="example-text-input">Item</label>
+                                                    <input type="text" class="form-control" id="example-text-input" name="price" value="{{ $details->inventori->code }}" readonly>
+                                            </div>
+                                            <div class="mb-4">
+                                                <label class="form-label" for="example-text-input">Quantity</label>
+                                                <input type="number" class="form-control" id="example-text-input" name="stock" value="{{ $details->qty }}"readonly>
+                                            </div>
+                                            <div class="mb-4">
+                                                <label class="form-label" for="example-text-input">Price</label>
+                                                <input type="text" class="form-control" id="example-text-input" name="stock" value="Rp. {{ number_format(floatval($details->price), 0, ',', '.') }}"readonly>
+                                            </div>
+                                            <div class="mb-4">
+                                                <label class="form-label" for="example-text-input">Sell By</label>
+                                                <input type="text" class="form-control" id="example-text-input" name="stock" value="{{ $data->user->username }}"readonly>
+                                            </div>
+                                        </div>
+                                      </div>
+                                      <div class="block-content block-content-full block-content-sm text-end border-top">
+                                          <button type="button" class="btn btn-alt-secondary" data-bs-dismiss="modal">
+                                          Close
+                                          </button>
+                                          <button type="button" class="btn btn-alt-primary" data-bs-dismiss="modal">
+                                          Done
+                                          </button>
+                                      </div>
+                                  </div>
+                                </div>
+                            </div>
+                          </div>
+                        <!--- End Modal -->
                         @empty
                           <tr>
                               <td colspan="5" class="fw-semibold text-muted text-center">Data Not Available</td>
@@ -409,10 +639,10 @@
         <div class="content py-3">
           <div class="row fs-sm">
             <div class="col-sm-6 order-sm-2 py-1 text-center text-sm-end">
-              Crafted with <i class="fa fa-heart text-danger"></i> by <a class="fw-semibold" href="https://pixelcave.com" target="_blank">pixelcave</a>
+              Crafted with <i class="fa fa-heart text-danger"></i> by <a class="fw-semibold" href="https://www.linkedin.com/in/rifqifauzi158/" target="_blank">Rifqi</a>
             </div>
             <div class="col-sm-6 order-sm-1 py-1 text-center text-sm-start">
-              <a class="fw-semibold" href="https://pixelcave.com/products/codebase" target="_blank">Codebase 5.7</a> &copy; <span data-toggle="year-copy"></span>
+              <a class="fw-semibold" href="https://www.linkedin.com/in/rifqifauzi158/" target="_blank">Rifqi</a> &copy; <span data-toggle="year-copy"></span>
             </div>
           </div>
         </div>

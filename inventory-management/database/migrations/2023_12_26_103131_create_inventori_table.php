@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('price');
             $table->string('stock');
+            $table->string('latest_stock')->nullable();
             $table->timestamps();
         });
     }

@@ -51,6 +51,7 @@
                                 <th>Name</th>
                                 <th>Price</th>
                                 <th>Stock</th>
+                                <th>Latest Stock</th>
                                 <th>Actions</th>
                                 </tr>
                             </thead>
@@ -72,6 +73,9 @@
                                         </td>
                                         <td>
                                             <a class="fw-semibold" href="javascript:void(0)">{{ $inv->stock }}</a>
+                                        </td>
+                                        <td>
+                                            <a class="fw-semibold" href="javascript:void(0)">{{ $inv->latest_stock }}</a>
                                         </td>
                                         <td>
                                             <a class="btn btn-sm btn-alt-secondary" href="{{ url('/dashboard/inventori/edit/'.encrypt($inv->id)) }}">

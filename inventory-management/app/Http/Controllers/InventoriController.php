@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Inventori;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -41,10 +42,13 @@ class InventoriController extends Controller
         try{
             DB::beginTransaction();
             Inventori::insert([
-                'code'  => $request->code,
-                'name'  => $request->name,
-                'price' => $request->price,
-                'stock' => $request->stock,
+                'code'              => $request->code,
+                'name'              => $request->name,
+                'price'             => $request->price,
+                'stock'             => $request->stock,
+                'latest_stock'      => $request->stock,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
 
             ]);
             DB::commit();
@@ -92,6 +96,8 @@ class InventoriController extends Controller
                 'name' => $request->name,
                 'price' => $request->price,
                 'stock' => $request->stock,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ]);
             DB::commit();
             $message = "Success Update Data";
@@ -136,5 +142,16 @@ class InventoriController extends Controller
         // Your custom logic to decode the hashed ID
         // Example: reverse the process of encoding
         return base64_decode($hashedId);
+    }
+
+    public function get_price(Request $request){
+        $itemId = $request->id;
+        $item =    Inventori::find($itemId);
+
+        if($item){
+            return response()->json(['price' => $item->price]);
+        }
+
+        return response()->json(['price' => null]);
     }
 }
